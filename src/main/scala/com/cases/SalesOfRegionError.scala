@@ -1,3 +1,3 @@
 package com.cases
 
-case class SalesOfRegionError(error: String)
+case class SalesOfRegionError(region: String, message: String)
