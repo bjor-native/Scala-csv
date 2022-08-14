@@ -8,4 +8,5 @@ object Dependencies {
   lazy val akkaHttp = "com.typesafe.akka" %% "akka-http" % akkaHttpVersion
   lazy val jsonData = "org.json4s" %% "json4s-native" % "4.0.5"
   lazy val jacksonData = "org.json4s" %% "json4s-jackson" % "4.0.5"
+  lazy val specs2Core = "org.specs2" %% "specs2-core" % "4.16.0"
 }
