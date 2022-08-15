@@ -65,23 +65,17 @@ object ReadCsv {
         .fromFile("/home/arcateon/IdeaProjects/Scala-csv/src/main/scala/source/testData.csv")
 
       var resultJson = ""
-
-      val salesArr = ArrayBuffer[Int]()
-      val indexArr = ArrayBuffer[Int]()
-      val idArr = ArrayBuffer[Int]()
+      val resultArray = ArrayBuffer[String]()
 
       for (line <- bufferedSource.getLines()) {
         if (line.contains(region.capitalize)) {
           val cols = line.split(",").map(_.trim)
-
-          val sales = cols(0).substring(1, cols(0).length - 1).toInt
-          val index = cols(1).substring(1, cols(1).length - 1).toInt
-          val id = cols(3).substring(1, cols(3).length - 1).toInt
-          salesArr += sales
-          indexArr += index
-          idArr += id
-
-          resultJson = Serialization.write(DataListOfRegion(salesArr, indexArr, idArr))
+          val resultString = s"{sales:${cols(0).substring(1, cols(0).length - 1)}" +
+            s", index:${cols(1).substring(1, cols(1).length - 1)}" +
+            s", region:${cols(2).substring(1, cols(2).length - 1)}" +
+            s", id:${cols(3).substring(1, cols(3).length - 1)}}"
+          resultArray += resultString
+          resultJson = Serialization.write(DataListOfRegion(resultArray))
         }
       }
       resultJson
@@ -90,7 +84,6 @@ object ReadCsv {
         "404"
     }
   }
-
 }
 
 

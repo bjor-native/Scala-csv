@@ -22,7 +22,7 @@ object Routes {
           val responseJson = Serialization.write(response)
           complete(responseJson)
         } else if (ReadCsv.salesByRegion(region) == 0) {
-          val response = SalesOfRegionError(region, message = "Invalid region")
+          val response = SalesOfRegionError(region, message = "invalid region")
           val responseJson = Serialization.write(response)
           complete(responseJson)
         } else complete("Server error")
@@ -33,15 +33,17 @@ object Routes {
           if (ReadCsv.salesById(id) != "404" && ReadCsv.salesById(id).nonEmpty) {
             complete(ReadCsv.salesById(id))
           } else if (ReadCsv.salesById(id).isEmpty) {
-            complete(Serialization.write(SalesByIdError(id, "Invalid id")))
+            complete(Serialization.write(SalesByIdError(id, "invalid id")))
           } else complete("Server error")
         }
-      } ~
+      } ~   // sample request: /data-list/?region=москва, /data-list/?region=Чувашия
       pathPrefix("data-list") {
         parameters("region") { (region) =>
-          if (ReadCsv.dataListByRegion(region) != "404") {
+          if (ReadCsv.dataListByRegion(region) != "404" && ReadCsv.dataListByRegion(region) != "") {
             complete(ReadCsv.dataListByRegion(region))
-          } else complete("error")
+          } else if (ReadCsv.dataListByRegion(region) == "") {
+            complete(Serialization.write(SalesOfRegionError(region, message = "invalid region")))
+          } else complete("Server error")
         }
       }
   }
