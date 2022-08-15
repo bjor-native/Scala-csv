@@ -9,4 +9,5 @@ object Dependencies {
   lazy val jsonData = "org.json4s" %% "json4s-native" % "4.0.5"
   lazy val jacksonData = "org.json4s" %% "json4s-jackson" % "4.0.5"
   lazy val specs2Core = "org.specs2" %% "specs2-core" % "4.16.0"
+  lazy val scalaCsv = "com.github.tototoshi" %% "scala-csv" % "1.3.10"
 }

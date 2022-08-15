@@ -2,7 +2,7 @@ package com
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.cases.{DataListBySalesError, SalesByIdError, SalesOfRegion, SalesOfRegionError}
+import com.cases.{DataListBySalesError, InputData, SalesByIdError, SalesOfRegion, SalesOfRegionError}
 import org.json4s.Formats
 import org.json4s.jackson._
 
@@ -62,6 +62,28 @@ object Routes {
           } else if (ReadCsv.dataListBySales(sales) == "405") {
             complete(Serialization.write(DataListBySalesError(sales, message = "invalid sales")))
           } else complete("Server error")
+        }
+      }
+      path("add-data") {
+        post {
+          entity(as[String]) {
+            body =>
+              val requestJson = JsonMethods.parse(body)
+              val request = requestJson.extract[InputData]
+              if (ReadCsv.writeDataToCsv(
+                request.sales,
+                request.index,
+                request.region,
+                request.id
+              ) != "404") {
+                complete(ReadCsv.writeDataToCsv(
+                  request.sales,
+                  request.index,
+                  request.region,
+                  request.id
+                ))
+              } else complete("Server error")
+          }
         }
       }
   }

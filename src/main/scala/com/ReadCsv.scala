@@ -1,15 +1,15 @@
 package com
 
-import com.cases.{DataListOfRegion, SalesById}
+import com.cases.{AddToCsvAnswer, DataListOfRegion, SalesById}
+import com.github.tototoshi.csv.CSVWriter
 import org.json4s.Formats
 import org.json4s.jackson.Serialization
-
 import java.io.FileNotFoundException
 import scala.io.BufferedSource
 import scala.collection.mutable.ArrayBuffer
 
 
-object ReadCsv {
+object ReadCsv extends App{
 
   implicit val formats: Formats = org.json4s.DefaultFormats.withLong.withDouble.withStrictOptionParsing
 
@@ -21,7 +21,7 @@ object ReadCsv {
       for (line <- bufferedSource.getLines()) {
         if (line.contains(region)) {
           val cols = line.split(",").map(_.trim)
-          val res = cols(0).substring(1, cols(0).length - 1).toInt
+          val res = cols(0).toInt
           sum += res
         }
       }
@@ -31,32 +31,32 @@ object ReadCsv {
         val fileNotFound = 404
         fileNotFound
     }
-    }
+  }
 
 
   def salesById(id: String): String = {
 
-      try {
-        val bufferedSource: BufferedSource = io.Source
-          .fromFile("/home/arcateon/IdeaProjects/Scala-csv/src/main/scala/source/testData.csv")
-        var resJson: String = ""
+    try {
+      val bufferedSource: BufferedSource = io.Source
+        .fromFile("/home/arcateon/IdeaProjects/Scala-csv/src/main/scala/source/testData.csv")
+      var resJson: String = ""
 
-        for (line <- bufferedSource.getLines()) {
-          val cols = line.split(",").map(_.trim)
-          if (cols(3).substring(1, cols(3).length - 1) == id) {
-            val sales = cols(0).substring(1, cols(0).length - 1)
-            val index = cols(1).substring(1, cols(1).length - 1)
-            val region = cols(2).substring(1, cols(2).length - 1)
-            val id = cols(3).substring(1, cols(3).length - 1)
+      for (line <- bufferedSource.getLines.drop(1)) {
+        val cols = line.split(",").map(_.trim)
+        if (cols(3) == id) {
+          val sales = cols(0)
+          val index = cols(1)
+          val region = cols(2)
+          val id = cols(3)
 
-            resJson = Serialization.write(SalesById(region, index, sales, id))
-          }
+          resJson = Serialization.write(SalesById(region, index, sales, id))
         }
-        resJson
-      } catch {
-        case _: FileNotFoundException =>
-          "404"
       }
+      resJson
+    } catch {
+      case _: FileNotFoundException =>
+        "404"
+    }
   }
 
   def dataListByRegion(region: String): String = {
@@ -70,10 +70,10 @@ object ReadCsv {
       for (line <- bufferedSource.getLines()) {
         if (line.contains(region.capitalize)) {
           val cols = line.split(",").map(_.trim)
-          val resultString = s"{sales:${cols(0).substring(1, cols(0).length - 1)}" +
-            s", index:${cols(1).substring(1, cols(1).length - 1)}" +
-            s", region:${cols(2).substring(1, cols(2).length - 1)}" +
-            s", id:${cols(3).substring(1, cols(3).length - 1)}}"
+          val resultString = s"{sales:${cols(0)}" +
+            s", index:${cols(1)}" +
+            s", region:${cols(2)}" +
+            s", id:${cols(3)}}"
           resultArray += resultString
           resultJson = Serialization.write(DataListOfRegion(resultArray))
         }
@@ -94,15 +94,15 @@ object ReadCsv {
       val resultArray = ArrayBuffer[String]()
 
       for (line <- bufferedSource.getLines.drop(1)) {
-          val cols = line.split(",").map(_.trim)
-          if (cols(3).substring(1, cols(3).length - 1).startsWith(id)) {
-            val resultString = s"{sales:${cols(0).substring(1, cols(0).length - 1)}" +
-              s", index:${cols(1).substring(1, cols(1).length - 1)}" +
-              s", region:${cols(2).substring(1, cols(2).length - 1)}" +
-              s", id:${cols(3).substring(1, cols(3).length - 1)}}"
-            resultArray += resultString
-            resultJson = Serialization.write(DataListOfRegion(resultArray))
-          }
+        val cols = line.split(",").map(_.trim)
+        if (cols(3).startsWith(id)) {
+          val resultString = s"{sales:${cols(0)}" +
+            s", index:${cols(1)}" +
+            s", region:${cols(2)}" +
+            s", id:${cols(3)}}"
+          resultArray += resultString
+          resultJson = Serialization.write(DataListOfRegion(resultArray))
+        }
       }
       resultJson
     } catch {
@@ -121,11 +121,11 @@ object ReadCsv {
 
       for (line <- bufferedSource.getLines.drop(1)) {
         val cols = line.split(",").map(_.trim)
-        if (cols(0).substring(1, cols(0).length - 1).toInt > sales.toInt) {
-          val resultString = s"{sales:${cols(0).substring(1, cols(0).length - 1)}" +
-            s", index:${cols(1).substring(1, cols(1).length - 1)}" +
-            s", region:${cols(2).substring(1, cols(2).length - 1)}" +
-            s", id:${cols(3).substring(1, cols(3).length - 1)}}"
+        if (cols(0).toInt > sales.toInt) {
+          val resultString = s"{sales:${cols(0)}" +
+            s", index:${cols(1)}" +
+            s", region:${cols(2)}" +
+            s", id:${cols(3)}}"
           resultArray += resultString
           resultJson = Serialization.write(DataListOfRegion(resultArray))
         }
@@ -139,6 +139,34 @@ object ReadCsv {
     }
   }
 
+  def writeDataToCsv(sales: Int, index: Int, region: String, id: Int): String = {
+
+    val bufferedSource: BufferedSource = io.Source
+      .fromFile("/home/arcateon/IdeaProjects/Scala-csv/src/main/scala/source/testData.csv")
+    val idArr = ArrayBuffer[Int]()
+    for (line <- bufferedSource.getLines.drop(1)) {
+      val cols = line.split(",").map(_.trim)
+      idArr += cols(3).toInt
+    }
+
+    var resultJson = ""
+    if (!idArr.contains(id)) {
+      val writer = CSVWriter
+        .open("/home/arcateon/IdeaProjects/Scala-csv/src/main/scala/source/testData.csv"
+          , append = true)
+
+      writer.writeRow(List(sales, index, region, id))
+      writer.close
+      resultJson = Serialization.write(AddToCsvAnswer(success = true, "data added"))
+      resultJson
+    } else {
+      resultJson = Serialization.write(AddToCsvAnswer(success = false, "id value is already exist"))
+      resultJson
+    }
+  }
+
 }
+
+
 
 

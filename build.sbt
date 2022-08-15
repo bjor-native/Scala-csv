@@ -12,6 +12,7 @@ lazy val root = (project in file("."))
       akkaStream,
       jsonData,
       jacksonData,
-      specs2Core
+      specs2Core,
+      scalaCsv
     )
   )
