@@ -27,7 +27,7 @@ object ReadCsv {
       }
       sum
     } catch {
-      case _: FileNotFoundException => println("File not found")
+      case _: FileNotFoundException =>
         val fileNotFound = 404
         fileNotFound
     }
@@ -54,7 +54,7 @@ object ReadCsv {
         }
         resJson
       } catch {
-        case _: FileNotFoundException => println("File not found")
+        case _: FileNotFoundException =>
           "404"
       }
   }
@@ -80,7 +80,7 @@ object ReadCsv {
       }
       resultJson
     } catch {
-      case _: FileNotFoundException => println("File not found")
+      case _: FileNotFoundException =>
         "404"
     }
   }
@@ -106,7 +106,7 @@ object ReadCsv {
       }
       resultJson
     } catch {
-      case _: FileNotFoundException => println("File not found")
+      case _: FileNotFoundException =>
         "404"
     }
   }
@@ -132,8 +132,10 @@ object ReadCsv {
       }
       resultJson
     } catch {
-      case _: FileNotFoundException => println("File not found")
+      case _: FileNotFoundException =>
         "404"
+      case _: NumberFormatException =>
+        "405"
     }
   }
 

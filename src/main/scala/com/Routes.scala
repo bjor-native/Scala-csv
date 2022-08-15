@@ -57,9 +57,9 @@ object Routes {
       } ~   // sample request: /data-list-sales/?more-than=5000
       pathPrefix("data-list-sales") {
         parameters("more-than") { (sales) =>
-          if (ReadCsv.dataListBySales(sales) != "404" && ReadCsv.dataListBySales(sales) != "") {
+          if (ReadCsv.dataListBySales(sales) != "404" && ReadCsv.dataListBySales(sales) != "405") {
             complete(ReadCsv.dataListBySales(sales))
-          } else if (ReadCsv.dataListBySales(sales) == "") {
+          } else if (ReadCsv.dataListBySales(sales) == "405") {
             complete(Serialization.write(DataListBySalesError(sales, message = "invalid sales")))
           } else complete("Server error")
         }
