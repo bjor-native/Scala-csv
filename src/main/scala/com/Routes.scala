@@ -2,7 +2,7 @@ package com
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.cases.{SalesByIdError, SalesOfRegion, SalesOfRegionError}
+import com.cases.{DataListBySalesError, SalesByIdError, SalesOfRegion, SalesOfRegionError}
 import org.json4s.Formats
 import org.json4s.jackson._
 
@@ -45,13 +45,22 @@ object Routes {
             complete(Serialization.write(SalesOfRegionError(region, message = "invalid region")))
           } else complete("Server error")
         }
-      } ~   // sample request: /data-list/?region=москва, /data-list/?region=Чувашия
+      } ~   // sample request: /data-list-id/?start-with=30
       pathPrefix("data-list-id") {
-        parameters("id") { (id) =>
+        parameters("start-with") { (id) =>
           if (ReadCsv.dataListById(id) != "404" && ReadCsv.dataListById(id) != "") {
             complete(ReadCsv.dataListById(id))
           } else if (ReadCsv.dataListById(id) == "") {
             complete(Serialization.write(SalesByIdError(id, "invalid id")))
+          } else complete("Server error")
+        }
+      } ~   // sample request: /data-list-sales/?more-than=5000
+      pathPrefix("data-list-sales") {
+        parameters("more-than") { (sales) =>
+          if (ReadCsv.dataListBySales(sales) != "404" && ReadCsv.dataListBySales(sales) != "") {
+            complete(ReadCsv.dataListBySales(sales))
+          } else if (ReadCsv.dataListBySales(sales) == "") {
+            complete(Serialization.write(DataListBySalesError(sales, message = "invalid sales")))
           } else complete("Server error")
         }
       }
