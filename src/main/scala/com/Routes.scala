@@ -37,12 +37,21 @@ object Routes {
           } else complete("Server error")
         }
       } ~   // sample request: /data-list/?region=москва, /data-list/?region=Чувашия
-      pathPrefix("data-list") {
+      pathPrefix("data-list-region") {
         parameters("region") { (region) =>
           if (ReadCsv.dataListByRegion(region) != "404" && ReadCsv.dataListByRegion(region) != "") {
             complete(ReadCsv.dataListByRegion(region))
           } else if (ReadCsv.dataListByRegion(region) == "") {
             complete(Serialization.write(SalesOfRegionError(region, message = "invalid region")))
+          } else complete("Server error")
+        }
+      } ~   // sample request: /data-list/?region=москва, /data-list/?region=Чувашия
+      pathPrefix("data-list-id") {
+        parameters("id") { (id) =>
+          if (ReadCsv.dataListById(id) != "404" && ReadCsv.dataListById(id) != "") {
+            complete(ReadCsv.dataListById(id))
+          } else if (ReadCsv.dataListById(id) == "") {
+            complete(Serialization.write(SalesByIdError(id, "invalid id")))
           } else complete("Server error")
         }
       }
